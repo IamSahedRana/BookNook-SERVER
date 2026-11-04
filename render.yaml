@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: booknook-server
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_NAME
+        value: booknook
+      - key: MONGODB_URI
+        sync: false   # paste your Atlas connection string in the Render dashboard
+      - key: CLIENT_URL
+        sync: false   # your Vercel URL, e.g. https://booknook.vercel.app

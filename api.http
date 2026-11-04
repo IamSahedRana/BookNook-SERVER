@@ -1,0 +1,121 @@
+### BookNook API: try every route from VS Code
+### Install the "REST Client" extension (humao.rest-client), then click "Send Request" above any request.
+###
+### HOW TO GET A TOKEN
+###  1. Run the client (npm run dev) and log in at http://localhost:3000/login
+###  2. Open http://localhost:3000/dev/token and click Copy
+###  3. Paste it below as @token (it expires after about 15 minutes: click "New token" and copy again)
+
+@baseUrl = http://localhost:5000
+@token = PASTE_YOUR_TOKEN_HERE
+
+### After GET /books, copy a book _id here. After POST /borrows, copy the borrow _id.
+@bookId = PASTE_A_BOOK_ID
+@borrowId = PASTE_A_BORROW_ID
+
+
+### ------------------------------------------------------------------
+### 0. Health
+### ------------------------------------------------------------------
+GET {{baseUrl}}/health
+
+
+### ------------------------------------------------------------------
+### 1. GET /books  (public)
+### ------------------------------------------------------------------
+GET {{baseUrl}}/books
+
+### New Arrivals: newest 6
+GET {{baseUrl}}/books?sort=latest&limit=6
+
+### Only the books added by one reader (used by My Books)
+GET {{baseUrl}}/books?email=maya@example.com
+
+
+### ------------------------------------------------------------------
+### 2. GET /books/:id  (login required)
+### ------------------------------------------------------------------
+GET {{baseUrl}}/books/{{bookId}}
+Authorization: Bearer {{token}}
+
+### Without a token -> 401
+GET {{baseUrl}}/books/{{bookId}}
+
+
+### ------------------------------------------------------------------
+### 3. POST /books  (login required)
+### The owner (userName / userEmail) is taken from your token.
+### ------------------------------------------------------------------
+POST {{baseUrl}}/books
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "My Test Book",
+  "author": "Test Author",
+  "category": "Fiction",
+  "image": "https://i.ibb.co/placeholder/cover.jpg",
+  "description": "A short description of at least ten characters.",
+  "totalCopies": 3
+}
+
+### Invalid category -> 400
+POST {{baseUrl}}/books
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Bad Book",
+  "author": "Test Author",
+  "category": "Cooking",
+  "image": "https://i.ibb.co/placeholder/cover.jpg",
+  "description": "A short description of at least ten characters.",
+  "totalCopies": 3
+}
+
+
+### ------------------------------------------------------------------
+### 4. PATCH /books/:id  (owner only)
+### ------------------------------------------------------------------
+PATCH {{baseUrl}}/books/{{bookId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "My Test Book (2nd edition)",
+  "totalCopies": 4
+}
+
+
+### ------------------------------------------------------------------
+### 5. DELETE /books/:id  (owner only, nothing may be borrowed)
+### ------------------------------------------------------------------
+DELETE {{baseUrl}}/books/{{bookId}}
+Authorization: Bearer {{token}}
+
+
+### ------------------------------------------------------------------
+### 6. POST /borrows  (borrow a book for 7 days)
+### Run it twice to see the "already borrowed" error (409).
+### ------------------------------------------------------------------
+POST {{baseUrl}}/borrows
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "bookId": "{{bookId}}"
+}
+
+
+### ------------------------------------------------------------------
+### 7. GET /borrows  (only YOUR borrows)
+### ------------------------------------------------------------------
+GET {{baseUrl}}/borrows
+Authorization: Bearer {{token}}
+
+
+### ------------------------------------------------------------------
+### 8. DELETE /borrows/:id  (return the book)
+### ------------------------------------------------------------------
+DELETE {{baseUrl}}/borrows/{{borrowId}}
+Authorization: Bearer {{token}}
