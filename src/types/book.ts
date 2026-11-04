@@ -4,10 +4,6 @@ export const CATEGORIES = ["Fiction", "Science", "History", "Kids", "Others"] as
 export type Category = (typeof CATEGORIES)[number];
 
 export interface BookDoc {
-  _id: ObjectId;
-  title: string;
-  author: string;
-  category: Category;
   image: string;
   description: string;
   totalCopies: number;

@@ -1,6 +1,9 @@
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  image?: string | null;
+interface auth {
+  userName: string;
+  userEmail: string;
+  password: string;
+  confirmPassword?: string;
+  isAdmin?: boolean;
 }
+
+export type { auth }; 
