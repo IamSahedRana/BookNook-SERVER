@@ -21,17 +21,8 @@ export async function verifyJwt(req: Request, _res: Response, next: NextFunction
       audience: env.JWT_AUDIENCE,
     });
 
-    const email = typeof payload.email === "string" ? payload.email.toLowerCase() : null;
-    if (!email) {
-      throw new ApiError(401, "Your login token is missing an email. Please log in again.");
-    }
-
-    req.user = {
-      id: String(payload.sub ?? payload.id ?? email),
-      email,
-      name: typeof payload.name === "string" && payload.name ? payload.name : email,
-      image: typeof payload.image === "string" ? payload.image : null,
-    };
+  
+ 
     next();
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -39,14 +30,7 @@ export async function verifyJwt(req: Request, _res: Response, next: NextFunction
     if (error instanceof errors.JWTExpired) {
       throw new ApiError(401, "Your session has expired. Please log in again.");
     }
-    if (error instanceof errors.JOSEError && !(error instanceof errors.JWKSTimeout)) {
-      // bad signature, wrong issuer/audience, malformed token...
-      console.warn(`[auth] rejected token: ${error.code}`);
-      throw new ApiError(401, "Invalid login token. Please log in again.");
-    }
-
-    // Could not download the keys (client app not running, network...)
     console.error("[auth] could not verify token:", error);
-    throw new ApiError(503, "Could not verify your login right now. Please try again in a moment.");
-  }
+      throw new ApiError(503, "Could not verify your login right now. Please try again in a moment.");
+    }
 }
